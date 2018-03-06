@@ -9,6 +9,12 @@ public class Player
 	private List<Card> hand = new List<Card> ();
 	private List<Card> pile = new List<Card> ();
 
+	public delegate void PlayerReadyHandler (Card card, Player p);
+	public event PlayerReadyHandler PlayerReady;
+
+	public delegate void PlayerCanceledHandler (Player p);
+	public event PlayerCanceledHandler PlayerCanceled;
+
 	public Player (string name)
 	{
 		this.name = name;	
@@ -39,9 +45,30 @@ public class Player
 		return score;
 	}
 
-	public void Play (int cardIndex, int lane)
+	public void Choose (int cardIndex)
 	{
-		
+		OnPlayerReady (hand [cardIndex]);
+	}
+
+	public void Cancel ()
+	{
+
+	}
+
+	protected void OnPlayerReady (Card card)
+	{
+		if (PlayerReady != null)
+		{
+			PlayerReady (card, this);
+		}
+	}
+
+	private void OnPlayerCanceled ()
+	{
+		if (PlayerCanceled != null)
+		{
+			PlayerCanceled (this);
+		}
 	}
 		
 	public string Name
@@ -51,11 +78,12 @@ public class Player
 			return name;
 		}
 	}
-	public List<Card> Hand
+
+	public Card[] Hand
 	{
 		get 
 		{
-			return hand;
+			return hand.ToArray ();
 		}
 	}
 }
